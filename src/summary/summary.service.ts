@@ -1,12 +1,23 @@
-import { Injectable, Get } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ReportType } from 'src/data';
 import { ReportService } from 'src/report/report.service';
 
 @Injectable()
 export class SummaryService {
   constructor(private readonly reportService: ReportService) {}
 
-  @Get()
   calculateSummary() {
-    return;
+    const totalExpense = this.reportService
+      .getAllreports(ReportType.EXPENSE)
+      .reduce((sum, report) => sum + report.amount, 0);
+    const totalIncome = this.reportService
+      .getAllreports(ReportType.INCOME)
+      .reduce((sum, report) => sum + report.amount, 0);
+
+    return {
+      totalExpense,
+      totalIncome,
+      netIncome: totalIncome - totalExpense,
+    };
   }
 }
